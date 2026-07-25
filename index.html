@@ -134,8 +134,8 @@
 
 <div class="controls" id="controls">
   <div class="field">
-    <label for="lotCount">Number of lots</label>
-    <input type="number" id="lotCount" min="1" max="60" value="6">
+    <label>Grouping</label>
+    <span class="per-lot">By team / era — 6 lots</span>
   </div>
   <span class="per-lot" id="perLotReadout"></span>
   <div class="spacer"></div>
@@ -204,7 +204,7 @@
     user: "",            // e.g. "yourusername"  (blank = auto-detect)
     repo: "",            // e.g. "f1-models"     (blank = auto-detect)
     branch: "main",      // usually "main"
-    imageFolder: ""      // "" = read photos from the top level of the repo
+    imageFolder: "images"// looks here first, then falls back to the repo top level
   };
 
   var IMG_RE = /\.(jpe?g|png|gif|webp|avif|bmp)$/i;
@@ -212,6 +212,13 @@
 
   var files = [];              // {name, url}
   var lotCount = 6;
+  /* ===== team-based lot assignment (baked in from the merged catalog) ===== */
+  var LOT_NAMES=["Lot 1 · Williams F1 — Full Team Run", "Lot 2 · Benetton — Green-Car Era", "Lot 3 · Sauber, Prost & Ligier", "Lot 4 · Minardi, Arrows, Jordan & Privateers", "Lot 5 · McLaren, Ferrari, Renault & Works Teams", "Lot 6 · Tyrrell & BAR + Classic Constructors"];
+  var LOT_MAP={"0F46A812-0AA8-413A-80C9-8B4D64EC1ADC 2.jpeg": 1, "147CCAB9-8CCF-46FE-A9AD-8C4241A931FA 2.jpeg": 1, "169733B9-D676-4A50-A826-BF4F88021527 2.jpeg": 1, "IMG_3285.jpeg": 5, "IMG_3286.jpeg": 5, "IMG_3287.jpeg": 5, "IMG_3288.jpeg": 5, "IMG_3291.jpeg": 4, "IMG_3292.jpeg": 4, "IMG_3293.jpeg": 1, "IMG_3294.jpeg": 1, "IMG_3296.jpeg": 4, "IMG_3297.jpeg": 4, "IMG_3298.jpeg": 6, "IMG_3299.jpeg": 6, "IMG_3300.jpeg": 6, "IMG_3301.jpeg": 6, "IMG_3303.jpeg": 4, "IMG_3304.jpeg": 4, "IMG_3305.jpeg": 4, "IMG_3306.jpeg": 4, "IMG_3307.jpeg": 4, "IMG_3308.jpeg": 6, "IMG_3309.jpeg": 6, "IMG_3310.jpeg": 1, "IMG_3319.jpeg": 1, "IMG_3320.jpeg": 1, "IMG_3321.jpeg": 2, "IMG_3323.jpeg": 4, "IMG_3324.jpeg": 4, "IMG_3325.jpeg": 4, "IMG_3326.jpeg": 3, "IMG_3327.jpeg": 2, "IMG_3328.jpeg": 2, "IMG_3329.jpeg": 5, "IMG_3330.jpeg": 5, "IMG_3331.jpeg": 5, "IMG_3332.jpeg": 5, "IMG_3333.jpeg": 5, "IMG_3334.jpeg": 5, "IMG_3335.jpeg": 4, "IMG_3336.jpeg": 1, "IMG_3337.jpeg": 6, "IMG_3338.jpeg": 4, "IMG_3339.jpeg": 4, "IMG_3340.jpeg": 5, "IMG_3341.jpeg": 6, "IMG_3342.jpeg": 6, "IMG_3343.jpeg": 6, "IMG_3344.jpeg": 6, "IMG_3345.jpeg": 6, "IMG_3346.jpeg": 4, "IMG_3347.jpeg": 6, "IMG_3348.jpeg": 6, "IMG_3349.jpeg": 6, "IMG_3350.jpeg": 6, "IMG_3351.jpeg": 6, "IMG_3352.jpeg": 6, "IMG_3353.jpeg": 6, "IMG_3354.jpeg": 6, "IMG_3355.jpeg": 6, "IMG_3356.jpeg": 3, "IMG_3357.jpeg": 3, "IMG_3358.jpeg": 3, "IMG_3359.jpeg": 3, "IMG_3360.jpeg": 3, "IMG_3361.jpeg": 3, "IMG_3362.jpeg": 3, "IMG_3363.jpeg": 3, "IMG_3364.jpeg": 3, "IMG_3365.jpeg": 3, "IMG_3366.jpeg": 3, "IMG_3367.jpeg": 3, "IMG_3368.jpeg": 3, "IMG_3369.jpeg": 3, "IMG_3370.jpeg": 3, "IMG_3371.jpeg": 3, "IMG_3372.jpeg": 3, "IMG_3373.jpeg": 3, "IMG_3374.jpeg": 3, "IMG_3375.jpeg": 3, "IMG_3376.jpeg": 3, "IMG_3377.jpeg": 3, "IMG_3378.jpeg": 3, "IMG_3379.jpeg": 3, "IMG_3380.jpeg": 3, "IMG_3381.jpeg": 3, "IMG_3382.jpeg": 3, "IMG_3383.jpeg": 3, "IMG_3384.jpeg": 3, "IMG_3385.jpeg": 3, "IMG_3386.jpeg": 3, "IMG_3387.jpeg": 3, "IMG_3388.jpeg": 3, "IMG_3389.jpeg": 3, "IMG_3390.jpeg": 3, "IMG_3391.jpeg": 3, "IMG_3392.jpeg": 3, "IMG_3393.jpeg": 3, "IMG_3394.jpeg": 3, "IMG_3395.jpeg": 3, "IMG_3396.jpeg": 3, "IMG_3397.jpeg": 3, "IMG_3398.jpeg": 3, "IMG_3399.jpeg": 3, "IMG_3404.jpeg": 1, "IMG_3405.jpeg": 6, "IMG_3406.jpeg": 6, "IMG_3407.jpeg": 6, "IMG_3408.jpeg": 6, "IMG_3409.jpeg": 6, "IMG_3410.jpeg": 1, "IMG_3411.jpeg": 6, "IMG_3412.jpeg": 6, "IMG_3413.jpeg": 6, "IMG_3414.jpeg": 6, "IMG_3415.jpeg": 6, "IMG_3416.jpeg": 6, "IMG_3417.jpeg": 6, "IMG_3418.jpeg": 6, "IMG_3419.jpeg": 6, "IMG_3420.jpeg": 5, "IMG_3421.jpeg": 5, "IMG_3422.jpeg": 5, "IMG_3423.jpeg": 5, "IMG_3424.jpeg": 5, "IMG_3425.jpeg": 1, "IMG_3426.jpeg": 2, "IMG_3427.jpeg": 2, "IMG_3428.jpeg": 2, "IMG_3429.jpeg": 5, "IMG_3430.jpeg": 1, "IMG_3431.jpeg": 5, "IMG_3432.jpeg": 5, "IMG_3433.jpeg": 5, "IMG_3434.jpeg": 5, "IMG_3435.jpeg": 5, "IMG_3436.jpeg": 5, "IMG_3437.jpeg": 5, "IMG_3438.jpeg": 5, "IMG_3439.jpeg": 5, "IMG_3440.jpeg": 5, "IMG_3441.jpeg": 5, "IMG_3442.jpeg": 5, "IMG_3443.jpeg": 5, "IMG_3444.jpeg": 5, "IMG_3445.jpeg": 5, "IMG_3446.jpeg": 5, "IMG_3447.jpeg": 5, "IMG_3448.jpeg": 5, "IMG_3449.jpeg": 1, "IMG_3451.jpeg": 4, "IMG_3452.jpeg": 4, "IMG_3453.jpeg": 4, "IMG_3455.jpeg": 4, "IMG_3456.jpeg": 4, "IMG_3457.jpeg": 4, "IMG_3458.jpeg": 4, "IMG_3459.jpeg": 4, "IMG_3460.jpeg": 4, "IMG_3461.jpeg": 5, "IMG_3462.jpeg": 5, "IMG_3463.jpeg": 4, "IMG_3464.jpeg": 4, "IMG_3465.jpeg": 4, "IMG_3466.jpeg": 5, "IMG_3467.jpeg": 2, "IMG_3468.jpeg": 2, "IMG_3469.jpeg": 2, "IMG_3470.jpeg": 2, "IMG_3471.jpeg": 2, "IMG_3472.jpeg": 2, "IMG_3473.jpeg": 2, "IMG_3474.jpeg": 2, "IMG_3475.jpeg": 2, "IMG_3476.jpeg": 2, "IMG_3477.jpeg": 2, "IMG_3478.jpeg": 2, "IMG_3479.jpeg": 2, "IMG_3480.jpeg": 2, "IMG_3481.jpeg": 2, "IMG_3482.jpeg": 2, "IMG_3483.jpeg": 2, "IMG_3484.jpeg": 2, "IMG_3485.jpeg": 2, "IMG_3486.jpeg": 2, "IMG_3487.jpeg": 2, "IMG_3488.jpeg": 2, "IMG_3489.jpeg": 2, "IMG_3490.jpeg": 2, "IMG_3491.jpeg": 2, "IMG_3492.jpeg": 2, "IMG_3493.jpeg": 2, "IMG_3494.jpeg": 2, "IMG_3495.jpeg": 2, "IMG_3496.jpeg": 2, "IMG_3497.jpeg": 2, "IMG_3498.jpeg": 2, "IMG_3499.jpeg": 2, "IMG_3500.jpeg": 2, "IMG_3501.jpeg": 2, "IMG_3502.jpeg": 2, "IMG_3503.jpeg": 2, "IMG_3504.jpeg": 2, "IMG_3505.jpeg": 2, "IMG_3506.jpeg": 2, "IMG_3507.jpeg": 2, "IMG_3508.jpeg": 2, "IMG_3509.jpeg": 2, "IMG_3510.jpeg": 2, "IMG_3511.jpeg": 2, "IMG_3512.jpeg": 2, "IMG_3513.jpeg": 2, "IMG_3514.jpeg": 2, "IMG_3515.jpeg": 2, "IMG_3516.jpeg": 2, "IMG_3517.jpeg": 2, "IMG_3518.jpeg": 2, "IMG_3519.jpeg": 2, "IMG_3520.jpeg": 2, "IMG_3521.jpeg": 2, "IMG_3522.jpeg": 5, "IMG_3523.jpeg": 5, "IMG_3524.jpeg": 5, "IMG_3525.jpeg": 5, "IMG_3527.jpeg": 5, "IMG_3528.jpeg": 5, "IMG_3529.jpeg": 5, "IMG_3530.jpeg": 5, "IMG_3531.jpeg": 5, "IMG_3532.jpeg": 5, "IMG_3533.jpeg": 5, "IMG_3534.jpeg": 4, "IMG_3535.jpeg": 6, "IMG_3536.jpeg": 6, "IMG_3537.jpeg": 6, "IMG_3538.jpeg": 6, "IMG_3539.jpeg": 6, "IMG_3540.jpeg": 6, "IMG_3541.jpeg": 6, "IMG_3542.jpeg": 4, "IMG_3543.jpeg": 4, "IMG_3544.jpeg": 4, "IMG_3545.jpeg": 4, "IMG_3546.jpeg": 4, "IMG_3547.jpeg": 4, "IMG_3548.jpeg": 4, "IMG_3549.jpeg": 4, "IMG_3550.jpeg": 4, "IMG_3551.jpeg": 4, "IMG_3552.jpeg": 1, "IMG_3553.jpeg": 4, "IMG_3554.jpeg": 1, "IMG_3555.jpeg": 1, "IMG_3556.jpeg": 1, "IMG_3557.jpeg": 5, "IMG_3558.jpeg": 5, "IMG_3559.jpeg": 4, "IMG_3560.jpeg": 4, "IMG_3561.jpeg": 4, "IMG_3562.jpeg": 4, "IMG_3563.jpeg": 4, "IMG_3564.jpeg": 6, "IMG_3565.jpeg": 6, "IMG_3566.jpeg": 6, "IMG_3567.jpeg": 6, "IMG_3568.jpeg": 6, "IMG_3569.jpeg": 6, "IMG_3570.jpeg": 6, "IMG_3571.jpeg": 4, "IMG_3572.jpeg": 4, "IMG_3573.jpeg": 4, "IMG_3574.jpeg": 4, "IMG_3575.jpeg": 4, "IMG_3576.jpeg": 4, "IMG_3577.jpeg": 4, "IMG_3578.jpeg": 4, "IMG_3579.jpeg": 4, "IMG_3580.jpeg": 4, "IMG_3581.jpeg": 4, "IMG_3582.jpeg": 3, "IMG_3583.jpeg": 3, "IMG_3584.jpeg": 3, "IMG_3585.jpeg": 3, "IMG_3586.jpeg": 3, "IMG_3587.jpeg": 3, "IMG_3588.jpeg": 3, "IMG_3589.jpeg": 3, "IMG_3590.jpeg": 6, "IMG_3591.jpeg": 6, "IMG_3592.jpeg": 6, "IMG_3593.jpeg": 6, "IMG_3594.jpeg": 6, "IMG_3595.jpeg": 6, "IMG_3596.jpeg": 6, "IMG_3608.jpeg": 1, "IMG_3609.jpeg": 1, "IMG_3610.jpeg": 1, "IMG_3611.jpeg": 1, "IMG_3612.jpeg": 1, "IMG_3613.jpeg": 1, "IMG_3614.jpeg": 1, "IMG_3615.jpeg": 1, "IMG_3616.jpeg": 1, "IMG_3617.jpeg": 1, "IMG_3618.jpeg": 1, "IMG_3619.jpeg": 1, "IMG_3620.jpeg": 1, "IMG_3621.jpeg": 1, "IMG_3622.jpeg": 1, "IMG_3623.jpeg": 1, "IMG_3624.jpeg": 1, "IMG_3625.jpeg": 1, "IMG_3626.jpeg": 1, "IMG_3627.jpeg": 1, "IMG_3628.jpeg": 1, "IMG_3629.jpeg": 5, "IMG_3630.jpeg": 5, "IMG_3631.jpeg": 1, "IMG_3632.jpeg": 1, "IMG_3633.jpeg": 1, "IMG_3634.jpeg": 1, "IMG_3635.jpeg": 1, "IMG_3636.jpeg": 1, "IMG_3637.jpeg": 1, "IMG_3638.jpeg": 1, "IMG_3639.jpeg": 1, "IMG_3640.jpeg": 1, "IMG_3641.jpeg": 1, "IMG_3642.jpeg": 1, "IMG_3643.jpeg": 1, "IMG_3644.jpeg": 1, "IMG_3645.jpeg": 1, "IMG_3646.jpeg": 1, "IMG_3647.jpeg": 1, "IMG_3648.jpeg": 1, "IMG_3649.jpeg": 1, "IMG_3650.jpeg": 1, "IMG_3651.jpeg": 1, "IMG_3652.jpeg": 1, "IMG_3653.jpeg": 1, "IMG_3654.jpeg": 1, "IMG_3655.jpeg": 1, "IMG_3656.jpeg": 1, "IMG_3657.jpeg": 1, "IMG_3658.jpeg": 1, "IMG_3659.jpeg": 1, "IMG_3660.jpeg": 1, "IMG_3661.jpeg": 1, "IMG_3662.jpeg": 1, "IMG_3663.jpeg": 1, "IMG_3664.jpeg": 1, "IMG_3665.jpeg": 1, "IMG_3666.jpeg": 1, "IMG_3667.jpeg": 1, "IMG_3668.jpeg": 1, "IMG_3669.jpeg": 1, "IMG_3670.jpeg": 1, "IMG_3671.jpeg": 1, "IMG_3672.jpeg": 1, "IMG_3674.jpeg": 1};
+  function normName(n){ return String(n).replace(/\.(jpe?g|heic)$/i,'').replace(/\s+2$/,'').toUpperCase(); }
+  var LOT_MAP_N = {}; (function(){ for(var k in LOT_MAP){ LOT_MAP_N[normName(k)] = LOT_MAP[k]; } })();
+  function lotOf(f){ var n=f&&f.name; if(n==null) return 6; if(LOT_MAP[n]!=null) return LOT_MAP[n]; var nn=LOT_MAP_N[normName(n)]; return nn!=null?nn:6; }
+
   var activeView = "all";
   var meta = {};               // personal edits (localStorage)
   var baseMeta = {};           // shared defaults (lots.json)
@@ -221,7 +228,7 @@
   var $ = function(id){ return document.getElementById(id); };
   var ghPanel=$("ghPanel"), ghStatus=$("ghStatus"), dropzone=$("dropzone"),
       loaded=$("loaded"), grid=$("grid"), tower=$("tower"), fileInput=$("fileInput"),
-      lotCountInput=$("lotCount"), perLotReadout=$("perLotReadout"),
+      perLotReadout=$("perLotReadout"),
       lotHead=$("lotHead"), allHead=$("allHead"), allNote=$("allNote"),
       lotTitle=$("lotTitle"), lotNotes=$("lotNotes"), lotTag=$("lotTag"),
       tCount=$("tCount"), tLots=$("tLots"), tPer=$("tPer");
@@ -229,20 +236,14 @@
   function folderLabel(r){ return (r&&r.folder) ? ("the "+r.folder+" folder") : "the top level of your repo"; }
   function isAll(){ return activeView==="all"; }
   function naturalSort(a,b){ return a.name.localeCompare(b.name, undefined, {numeric:true, sensitivity:"base"}); }
-  function distribution(total,n){ var base=Math.floor(total/n),rem=total%n,s=[]; for(var i=0;i<n;i++)s.push(base+(i<rem?1:0)); return s; }
-  function lotsFromFiles(){ var sizes=distribution(files.length,lotCount),lots=[],start=0; for(var i=0;i<sizes.length;i++){lots.push(files.slice(start,start+sizes[i]));start+=sizes[i];} return lots; }
+  function lotsFromFiles(){ var lots=[[],[],[],[],[],[]]; for(var i=0;i<files.length;i++){ var L=lotOf(files[i]); if(L<1||L>6)L=6; lots[L-1].push(files[i]); } return lots; }
   function saveMeta(){ try{ localStorage.setItem(STORE, JSON.stringify(meta)); }catch(e){} }
-  function effMeta(i){ var k="lot-"+i; return meta[k] || baseMeta[k] || {title:"",notes:""}; }
+  function effMeta(i){ var k="lot-"+i; return meta[k] || baseMeta[k] || {title:(LOT_NAMES[i]||""),notes:""}; }
   function ensurePersonal(i){ var k="lot-"+i; if(!meta[k]){ var b=baseMeta[k]||{}; meta[k]={title:b.title||"",notes:b.notes||""}; } return meta[k]; }
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
 
   function lotIndexMap(){
-    var sizes=distribution(files.length,lotCount), map=[], lot=0, remaining=sizes[0]||0;
-    for(var i=0;i<files.length;i++){
-      while(remaining<=0 && lot<sizes.length-1){ lot++; remaining=sizes[lot]; }
-      map.push(lot+1); remaining--;
-    }
-    return map;
+    var map=[]; for(var i=0;i<files.length;i++){ var L=lotOf(files[i]); map.push((L<1||L>6)?6:L); } return map;
   }
 
   /* ---------- resolve which repo to read ---------- */
@@ -258,6 +259,24 @@
   }
 
   /* ---------- load images from GitHub ---------- */
+  function apiUrlFor(r, folder){
+    var path = folder ? "/"+folder.split("/").filter(Boolean).map(encodeURIComponent).join("/") : "";
+    return "https://api.github.com/repos/"+r.user+"/"+r.repo+"/contents"+path+"?ref="+encodeURIComponent(r.branch);
+  }
+  // returns {images:[...], heic:N} on success, {rate:true} if rate-limited, or null if this location has no usable listing
+  function tryFolder(r, folder){
+    return fetch(apiUrlFor(r,folder)).then(function(res){
+      if(res.status===403) return {rate:true};
+      if(!res.ok) return null;
+      return res.json().then(function(data){
+        if(!Array.isArray(data)) return null;
+        var heic=data.filter(function(f){ return HEIC_RE.test(f.name); }).length;
+        var imgs=data.filter(function(f){ return f.type==="file" && IMG_RE.test(f.name); })
+                     .map(function(f){ return {name:f.name, url:f.download_url}; });
+        return {images:imgs, heic:heic};
+      }).catch(function(){ return null; });
+    }).catch(function(){ return null; });
+  }
   function loadFromGitHub(){
     var r=resolveRepo();
     if(!r.user || !r.repo){ showSetup(r); return; }
@@ -265,23 +284,23 @@
     ghStatus.innerHTML='<span class="spinner"></span> Loading photos from <b>'+escapeHtml(r.user)+'/'+escapeHtml(r.repo)+'</b> …';
     dropzone.classList.add("hidden");
 
-    var path = r.folder ? "/"+r.folder.split("/").filter(Boolean).map(encodeURIComponent).join("/") : "";
-    var api="https://api.github.com/repos/"+r.user+"/"+r.repo+"/contents"+path+"?ref="+encodeURIComponent(r.branch);
-    fetch(api).then(function(res){
-      if(!res.ok) throw {status:res.status, r:r, api:api};
-      return res.json();
-    }).then(function(data){
-      if(!Array.isArray(data)) throw {status:"not-a-folder", r:r, api:api};
-      var heicCount=data.filter(function(f){ return HEIC_RE.test(f.name); }).length;
-      var imgs=data.filter(function(f){ return f.type==="file" && IMG_RE.test(f.name); })
-                   .map(function(f){ return {name:f.name, url:f.download_url}; });
-      imgs.sort(naturalSort);
-      files=imgs;
-      loadLotsJson(r).then(function(){
-        if(files.length===0){ showEmpty(r, heicCount); }
-        else { render(); if(heicCount>0) console.warn(heicCount+" HEIC files skipped"); }
+    var candidates=[];
+    [CONFIG.imageFolder, "images", ""].forEach(function(f){ if(candidates.indexOf(f)<0) candidates.push(f); });
+
+    (function tryNext(i, lastHeic){
+      if(i>=candidates.length){ showEmpty(r, lastHeic); return; }
+      tryFolder(r, candidates[i]).then(function(result){
+        if(result && result.rate){ showError({status:403, r:r, api:apiUrlFor(r,candidates[i])}); return; }
+        if(result && result.images && result.images.length>0){
+          result.images.sort(naturalSort);
+          files=result.images;
+          loadLotsJson(r).then(function(){ render(); });
+          return;
+        }
+        var h=(result && result.heic) ? result.heic : lastHeic;
+        tryNext(i+1, h);
       });
-    }).catch(function(err){ showError(err); });
+    })(0, 0);
   }
 
   function loadLotsJson(r){
@@ -348,7 +367,7 @@
     if(files.length===0){ return; }
     ghPanel.classList.add("hidden"); loaded.classList.remove("hidden");
 
-    lotCount=Math.max(1, Math.min(parseInt(lotCountInput.value,10)||1, files.length||1));
+    lotCount=6;
     if(!isAll() && activeView>=lotCount) activeView=lotCount-1;
 
     var lots=lotsFromFiles(), sizes=lots.map(function(l){return l.length;});
@@ -356,7 +375,7 @@
     var mn=Math.min.apply(null,sizes), mx=Math.max.apply(null,sizes);
     var per=(mn===mx)?String(mn):(mn+"–"+mx);
     tPer.textContent=per;
-    perLotReadout.textContent=files.length+" models ÷ "+lotCount+" lots = "+per+" per lot";
+    perLotReadout.textContent="";
 
     renderTower(lots);
     renderGrid(lots);
@@ -441,8 +460,6 @@
     for(var i=1;i<btns.length;i++){ var el=btns[i].querySelector(".lot-name"); if(el){ var t=effMeta(i-1).title; el.textContent=t?t:"Untitled lot"; } }
   }
 
-  lotCountInput.addEventListener("change",render);
-  lotCountInput.addEventListener("input",render);
   $("reloadBtn").addEventListener("click",function(){ files=[]; activeView="all"; loadFromGitHub(); });
   if($("pickBtn2")) $("pickBtn2").addEventListener("click",function(){ fileInput.click(); });
   fileInput.addEventListener("change",function(e){ addFiles(e.target.files); fileInput.value=""; });
